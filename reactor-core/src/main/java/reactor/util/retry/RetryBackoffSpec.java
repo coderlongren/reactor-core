@@ -332,7 +332,7 @@ public final class RetryBackoffSpec implements Retry, Supplier<Retry> {
 	/**
 	 * Set the generator for the {@link Exception} to be propagated when the maximum amount of retries
 	 * is exhausted. By default, throws an {@link Exceptions#retryExhausted(String, Throwable)} with the
-	 * message reflecting the total attempt index, transien attempt index and maximum retry count.
+	 * message reflecting the total attempt index, transient attempt index and maximum retry count.
 	 * The cause of the last {@link RetrySignal} is also added as the exception's cause.
 	 *
 	 *
