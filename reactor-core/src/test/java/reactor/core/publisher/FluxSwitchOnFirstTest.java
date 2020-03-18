@@ -115,7 +115,7 @@ public class FluxSwitchOnFirstTest {
         StepVerifier.create(Flux.just(1L)
                                 .doOnComplete(() -> {
                                     try {
-                                        latch.await();
+                                        if (!latch.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("latch didn't complete in 5s");
                                     }
                                     catch (InterruptedException e) {
                                         throw new RuntimeException(e);
@@ -146,7 +146,7 @@ public class FluxSwitchOnFirstTest {
         StepVerifier.create(Flux.just(1L)
                                 .doOnComplete(() -> {
                                     try {
-                                        latch.await();
+                                        if (!latch.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("latch didn't complete in 5s");
                                     }
                                     catch (InterruptedException e) {
                                         throw new RuntimeException(e);
@@ -740,7 +740,7 @@ public class FluxSwitchOnFirstTest {
                 .switchOnFirst((first, innerFlux) -> innerFlux.map(String::valueOf))
                 .doOnCancel(() -> {
                     try {
-                        latch1.await();
+                        if (!latch1.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("latch didn't complete in 5s");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -849,7 +849,7 @@ public class FluxSwitchOnFirstTest {
                 .doOnDiscard(Integer.class, e -> discarded[0] = e)
                 .doOnCancel(() -> {
                     try {
-                        latch.await();
+                        if (!latch.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("latch didn't complete in 5s");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1505,7 +1505,7 @@ public class FluxSwitchOnFirstTest {
                 Mockito.verify(mockSubscription).request(Mockito.longThat(argument -> argument.equals(54L)));
                 assertSubscriber.assertSubscribed()
                         .awaitAndAssertNextValues(signal)
-                        .await()
+                        .await(Duration.ofSeconds(5))
                         .assertComplete();
             }
         }
@@ -1535,9 +1535,9 @@ public class FluxSwitchOnFirstTest {
                 RaceTestUtils.race(() -> switchOnFirstMain.onError(ex), () -> switchOnFirstMain.request(55));
                 Mockito.verify(mockSubscription).request(Mockito.longThat(argument -> argument.equals(54L)));
                 assertSubscriber.assertSubscribed()
-                        .awaitAndAssertNextValues(signal)
-                        .await()
-                        .assertErrorWith(t -> Assertions.assertThat(t).isEqualTo(ex));
+                                .awaitAndAssertNextValues(signal)
+                                .await(Duration.ofSeconds(5))
+                                .assertErrorWith(t -> Assertions.assertThat(t).isEqualTo(ex));
             }
         }
     }
